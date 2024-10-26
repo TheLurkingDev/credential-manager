@@ -135,6 +135,7 @@ input {
   font-size: 1rem;
   outline: none;
   transition: all 0.3s;
+  color: black;
 }
 
 input:focus {
