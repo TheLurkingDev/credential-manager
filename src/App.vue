@@ -1,78 +1,73 @@
 <template>
-  <div class="app-container">
-    <header class="app-header">
-      <h1>Credential Manager</h1>
-      <div class="status-bar" v-if="store.isLoading || store.error">
-        <div v-if="store.isLoading" class="loading">Loading...</div>
-        <div v-if="store.error" class="error">{{ store.error }}</div>
+  <div class="app">
+    <template v-if="userStore.isAuthenticated">
+      <header class="header">
+        <span>Welcome, {{ userStore.username }}</span>
+        <button @click="handleLogout" class="logout-button">Logout</button>
+      </header>
+      <div class="content">
+        <h2>Dashboard</h2>
+        <p>You are now logged in.</p>
       </div>
-    </header>
-
-    <main class="app-content">
-      <div class="welcome-message">
-        <h2>Welcome to Credential Manager</h2>
-        <p>A secure and efficient way to manage your credentials</p>
-      </div>
-    </main>
+    </template>
+    <LoginForm v-else />
   </div>
 </template>
 
 <script setup lang="ts">
-import { useMainStore } from './stores'
+import { useUserStore } from './stores/userStore';
+import LoginForm from './components/LoginForm.vue';
 
-const store = useMainStore()
+const userStore = useUserStore();
+
+const handleLogout = () => {
+  userStore.logout();
+};
 </script>
 
 <style>
-.app-container {
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-  background-color: #f5f5f5;
-}
-
-.app-header {
-  background-color: #2c3e50;
-  color: white;
-  padding: 1rem 2rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.app-header h1 {
+* {
   margin: 0;
-  font-size: 1.5rem;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-.status-bar {
-  margin-top: 0.5rem;
-  font-size: 0.9rem;
+body {
+  font-family: Arial, sans-serif;
+  line-height: 1.6;
+  color: #333;
 }
 
-.loading {
-  color: #3498db;
+.app {
+  min-height: 100vh;
 }
 
-.error {
-  color: #e74c3c;
+.header {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  padding: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: white;
 }
 
-.app-content {
-  flex: 1;
+.logout-button {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.logout-button:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.content {
   padding: 2rem;
-  overflow-y: auto;
-}
-
-.welcome-message {
-  text-align: center;
-  margin-top: 2rem;
-}
-
-.welcome-message h2 {
-  color: #2c3e50;
-  margin-bottom: 1rem;
-}
-
-.welcome-message p {
-  color: #7f8c8d;
+  color: white;
 }
 </style>
