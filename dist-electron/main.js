@@ -1,71 +1,63 @@
-import { app, BrowserWindow, ipcMain } from 'electron';
-import path from 'path';
-import { DatabaseService } from './database';
-
-let mainWindow: BrowserWindow | null = null;
-
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const electron_1 = require("electron");
+const path_1 = __importDefault(require("path"));
+const database_1 = require("./database");
+let mainWindow = null;
 // Disable GPU acceleration
-app.disableHardwareAcceleration();
-
+electron_1.app.disableHardwareAcceleration();
 function createWindow() {
-    mainWindow = new BrowserWindow({
+    mainWindow = new electron_1.BrowserWindow({
         width: 1200,
         height: 800,
         webPreferences: {
             nodeIntegration: false,
             contextIsolation: true,
-            preload: path.join(__dirname, 'preload.js'),
+            preload: path_1.default.join(__dirname, 'preload.js'),
             sandbox: false
         },
         show: false,
         backgroundColor: '#ffffff'
     });
-
     // Always load from dev server during development
     mainWindow.loadURL('http://localhost:7173').catch(console.error);
-    
     // Show window when ready to show
     mainWindow.once('ready-to-show', () => {
         mainWindow?.show();
     });
-
     // Open DevTools in development
     mainWindow.webContents.openDevTools();
-
     mainWindow.on('closed', () => {
         mainWindow = null;
     });
 }
-
-app.whenReady().then(() => {
+electron_1.app.whenReady().then(() => {
     // Initialize database
-    DatabaseService.getInstance();
-    
+    database_1.DatabaseService.getInstance();
     createWindow();
-
-    app.on('activate', () => {
-        if (BrowserWindow.getAllWindows().length === 0) {
+    electron_1.app.on('activate', () => {
+        if (electron_1.BrowserWindow.getAllWindows().length === 0) {
             createWindow();
         }
     });
 }).catch(console.error);
-
-app.on('window-all-closed', () => {
+electron_1.app.on('window-all-closed', () => {
     if (process.platform !== 'darwin') {
-        app.quit();
+        electron_1.app.quit();
     }
 });
-
 // Handle user creation
-ipcMain.handle('create-user', async (_, username: string, password: string) => {
+electron_1.ipcMain.handle('create-user', async (_, username, password) => {
     console.log('Creating user:', username);
-    const db = DatabaseService.getInstance();
+    const db = database_1.DatabaseService.getInstance();
     return db.createUser(username, password);
 });
-
 // Handle user verification
-ipcMain.handle('verify-user', async (_, username: string, password: string) => {
+electron_1.ipcMain.handle('verify-user', async (_, username, password) => {
     console.log('Verifying user:', username);
-    const db = DatabaseService.getInstance();
+    const db = database_1.DatabaseService.getInstance();
     return db.verifyUser(username, password);
 });
